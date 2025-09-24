@@ -2,4 +2,5 @@
   { "title": "Introduction", "file": "intro.md" },
   { "title": "Guide", "file": "guide.md" },
   { "title": "API Reference", "file": "api.md" }
+  { "title": "Website construction", "file": "website.md" }
 ]
