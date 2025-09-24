@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <title>My Docs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Fonts & Prism CSS -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-tomorrow.css" rel="stylesheet" />
+  
   <style>
     :root {
       --bg: #ffffff;
@@ -65,9 +69,33 @@
     }
 
     main h1, main h2, main h3 { color: var(--accent); }
-    main pre { background: var(--code-bg); padding: 15px; border-radius: 8px; overflow-x: auto; }
-    code { font-family: 'Source Code Pro', monospace; }
     main > * { margin-bottom: 20px; }
+
+    pre { 
+      position: relative;
+      border-radius: 8px; 
+      overflow-x: auto; 
+      margin-bottom: 1.5em;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .copy-btn:hover { opacity: 1; }
+
+    code { font-family: 'Source Code Pro', monospace; }
 
     /* Mobile */
     #menuButton {
@@ -133,14 +161,40 @@
   </nav>
   <main id="content">Select a page from the sidebar.</main>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-javascript.min.js"></script>
+
   <script>
+    // Load Markdown and highlight code
     async function loadPage(file) {
       try {
         const res = await fetch(file);
         if (!res.ok) throw new Error("File not found");
         const text = await res.text();
-        document.getElementById("content").innerHTML = marked.parse(text);
+        const html = marked.parse(text);
+        document.getElementById("content").innerHTML = html;
+
+        // Highlight all code blocks
+        Prism.highlightAll();
+
+        // Add copy buttons
+        document.querySelectorAll("pre > code").forEach((block) => {
+          if (!block.parentElement.querySelector(".copy-btn")) {
+            const btn = document.createElement("button");
+            btn.className = "copy-btn";
+            btn.innerText = "Copy";
+            btn.addEventListener("click", () => {
+              navigator.clipboard.writeText(block.innerText).then(() => {
+                btn.innerText = "Copied!";
+                setTimeout(() => btn.innerText = "Copy", 1500);
+              });
+            });
+            block.parentElement.appendChild(btn);
+          }
+        });
+
         window.scrollTo(0, 0);
       } catch (e) {
         document.getElementById("content").innerHTML = `<p style="color:red;">Error loading ${file}</p>`;
@@ -158,17 +212,11 @@
     // Mobile sidebar toggle
     const menuButton = document.getElementById("menuButton");
     const sidebar = document.getElementById("sidebar");
-    menuButton.addEventListener("click", () => {
-      sidebar.classList.toggle("show");
-    });
-
-    sidebar.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => sidebar.classList.remove("show"));
-    });
+    menuButton.addEventListener("click", () => sidebar.classList.toggle("show"));
+    sidebar.querySelectorAll("a").forEach(link => link.addEventListener("click", () => sidebar.classList.remove("show")));
 
     // THEME HANDLING
     const themeSelect = document.getElementById("themeSelect");
-
     function applyTheme(theme) {
       if (theme === "system") {
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -178,13 +226,10 @@
       }
       localStorage.setItem("theme", theme);
     }
-
     themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
-
     const savedTheme = localStorage.getItem("theme") || "system";
     themeSelect.value = savedTheme;
     applyTheme(savedTheme);
-
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
       if (themeSelect.value === "system") applyTheme("system");
     });
