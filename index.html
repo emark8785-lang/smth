@@ -5,13 +5,49 @@
   <title>My Docs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; display: flex; }
-    nav { width: 220px; background: #f5f5f5; padding: 15px; height: 100vh; overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --sidebar-bg: #f5f5f5;
+      --link-hover: #ddd;
+      --code-bg: #eee;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1e1e1e;
+      --fg: #e5e5e5;
+      --sidebar-bg: #2a2a2a;
+      --link-hover: #444;
+      --code-bg: #333;
+    }
+
+    body {
+      margin: 0; 
+      font-family: Arial, sans-serif; 
+      display: flex; 
+      background: var(--bg); 
+      color: var(--fg);
+    }
+    nav { 
+      width: 220px; 
+      background: var(--sidebar-bg); 
+      padding: 15px; 
+      height: 100vh; 
+      overflow-y: auto; 
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1); 
+      transition: transform 0.3s ease; 
+    }
     nav h2 { margin-top: 0; }
-    nav a { display: block; padding: 8px; text-decoration: none; color: #333; border-radius: 4px; }
-    nav a:hover { background: #ddd; }
+    nav a { 
+      display: block; 
+      padding: 8px; 
+      text-decoration: none; 
+      color: var(--fg); 
+      border-radius: 4px; 
+    }
+    nav a:hover { background: var(--link-hover); }
     main { flex: 1; padding: 20px; overflow-y: auto; }
-    pre { background: #eee; padding: 10px; overflow-x: auto; }
+    pre { background: var(--code-bg); padding: 10px; overflow-x: auto; }
     code { font-family: monospace; }
 
     /* Mobile styles */
@@ -27,6 +63,12 @@
       font-size: 16px;
       border-radius: 4px;
       z-index: 1000;
+    }
+
+    #themeSelect {
+      margin-top: 15px;
+      width: 100%;
+      padding: 6px;
     }
 
     @media (max-width: 768px) {
@@ -51,6 +93,12 @@
     <a href="#intro.md">Introduction</a>
     <a href="#guide.md">Guide</a>
     <a href="#api.md">API Reference</a>
+    <h3>Theme</h3>
+    <select id="themeSelect">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
   </nav>
   <main id="content">Select a page from the sidebar.</main>
 
@@ -83,11 +131,37 @@
       sidebar.classList.toggle("show");
     });
 
-    // Auto close sidebar on link click (mobile)
     sidebar.querySelectorAll("a").forEach(link => {
       link.addEventListener("click", () => {
         sidebar.classList.remove("show");
       });
+    });
+
+    // THEME HANDLING
+    const themeSelect = document.getElementById("themeSelect");
+
+    function applyTheme(theme) {
+      if (theme === "system") {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+      } else {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+      localStorage.setItem("theme", theme);
+    }
+
+    themeSelect.addEventListener("change", () => {
+      applyTheme(themeSelect.value);
+    });
+
+    // Init theme
+    const savedTheme = localStorage.getItem("theme") || "system";
+    themeSelect.value = savedTheme;
+    applyTheme(savedTheme);
+
+    // Watch for system changes
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if (themeSelect.value === "system") applyTheme("system");
     });
   </script>
 </body>
