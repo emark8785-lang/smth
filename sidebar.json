@@ -1,0 +1,5 @@
+[
+  { "title": "Introduction", "file": "intro.md" },
+  { "title": "Guide", "file": "guide.md" },
+  { "title": "API Reference", "file": "api.md" }
+]
