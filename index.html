@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Docs</title>
+  <style>
+    body { margin: 0; display: flex; font-family: Arial, sans-serif; }
+    nav { width: 220px; background: #f5f5f5; padding: 15px; height: 100vh; overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+    nav h2 { margin-top: 0; }
+    nav a { display: block; padding: 8px; text-decoration: none; color: #333; border-radius: 4px; }
+    nav a:hover { background: #ddd; }
+    main { flex: 1; padding: 20px; overflow-y: auto; }
+    pre { background: #eee; padding: 10px; overflow-x: auto; }
+    code { font-family: monospace; }
+  </style>
+</head>
+<body>
+  <nav>
+    <h2>Docs</h2>
+    <a href="#intro.md">Introduction</a>
+    <a href="#guide.md">Guide</a>
+    <a href="#api.md">API Reference</a>
+  </nav>
+  <main id="content">Select a page from the sidebar.</main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    async function loadPage(file) {
+      try {
+        const res = await fetch(file);
+        if (!res.ok) throw new Error("File not found");
+        const text = await res.text();
+        document.getElementById("content").innerHTML = marked.parse(text);
+      } catch (e) {
+        document.getElementById("content").innerHTML = `<p style="color:red;">Error loading ${file}</p>`;
+      }
+    }
+
+    function handleHash() {
+      const file = location.hash.substring(1);
+      if (file) loadPage(file);
+    }
+
+    window.addEventListener("hashchange", handleHash);
+    window.addEventListener("load", handleHash);
+  </script>
+</body>
+</html>
