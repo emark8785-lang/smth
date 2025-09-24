@@ -4,71 +4,101 @@
   <meta charset="UTF-8">
   <title>My Docs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #ffffff;
-      --fg: #000000;
+      --fg: #1e1e1e;
       --sidebar-bg: #f5f5f5;
-      --link-hover: #ddd;
-      --code-bg: #eee;
+      --link-hover: #e0e0e0;
+      --code-bg: #f0f0f0;
+      --accent: #4f46e5;
     }
 
     [data-theme="dark"] {
-      --bg: #1e1e1e;
-      --fg: #e5e5e5;
-      --sidebar-bg: #2a2a2a;
-      --link-hover: #444;
-      --code-bg: #333;
+      --bg: #121212;
+      --fg: #e0e0e0;
+      --sidebar-bg: #1f1f1f;
+      --link-hover: #333;
+      --code-bg: #1a1a1a;
+      --accent: #818cf8;
     }
 
+    * { box-sizing: border-box; }
     body {
-      margin: 0; 
-      font-family: Arial, sans-serif; 
-      display: flex; 
-      background: var(--bg); 
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      background: var(--bg);
       color: var(--fg);
+      transition: background 0.3s, color 0.3s;
     }
-    nav { 
-      width: 220px; 
-      background: var(--sidebar-bg); 
-      padding: 15px; 
-      height: 100vh; 
-      overflow-y: auto; 
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1); 
-      transition: transform 0.3s ease; 
+
+    nav {
+      width: 240px;
+      background: var(--sidebar-bg);
+      padding: 20px;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, background 0.3s;
+      border-right: 1px solid #ddd;
     }
-    nav h2 { margin-top: 0; }
-    nav a { 
-      display: block; 
-      padding: 8px; 
-      text-decoration: none; 
-      color: var(--fg); 
-      border-radius: 4px; 
+
+    nav h2 { margin-top: 0; font-weight: 600; color: var(--accent); }
+    nav a {
+      display: block;
+      padding: 10px 12px;
+      text-decoration: none;
+      color: var(--fg);
+      border-radius: 8px;
+      margin-bottom: 5px;
+      transition: background 0.2s;
     }
     nav a:hover { background: var(--link-hover); }
-    main { flex: 1; padding: 20px; overflow-y: auto; }
-    pre { background: var(--code-bg); padding: 10px; overflow-x: auto; }
-    code { font-family: monospace; }
 
-    /* Mobile styles */
+    main {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      transition: background 0.3s;
+    }
+
+    main h1, main h2, main h3 { color: var(--accent); }
+    main pre { background: var(--code-bg); padding: 15px; border-radius: 8px; overflow-x: auto; }
+    code { font-family: 'Source Code Pro', monospace; }
+    main > * { margin-bottom: 20px; }
+
+    /* Mobile */
     #menuButton {
       display: none;
       position: fixed;
-      top: 10px;
-      left: 10px;
-      background: #333;
+      top: 15px;
+      left: 15px;
+      background: linear-gradient(45deg, #4f46e5, #818cf8);
       color: #fff;
       border: none;
-      padding: 10px 15px;
-      font-size: 16px;
-      border-radius: 4px;
+      padding: 12px 18px;
+      font-size: 18px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
       z-index: 1000;
+      transition: transform 0.2s;
     }
 
+    #menuButton:hover { transform: scale(1.05); }
+
     #themeSelect {
-      margin-top: 15px;
+      margin-top: 20px;
       width: 100%;
-      padding: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: var(--bg);
+      color: var(--fg);
+      font-weight: 600;
+      cursor: pointer;
     }
 
     @media (max-width: 768px) {
@@ -79,25 +109,26 @@
         height: 100%;
         transform: translateX(-100%);
         z-index: 999;
+        border-right: none;
       }
       nav.show { transform: translateX(0); }
-      main { margin-top: 50px; }
+      main { margin-top: 60px; padding: 20px; }
       #menuButton { display: block; }
     }
   </style>
 </head>
 <body>
-  <button id="menuButton">☰ Menu</button>
+  <button id="menuButton">☰</button>
   <nav id="sidebar">
-    <h2>Docs</h2>
+    <h2>My Docs</h2>
     <a href="#intro.md">Introduction</a>
     <a href="#guide.md">Guide</a>
     <a href="#api.md">API Reference</a>
     <h3>Theme</h3>
     <select id="themeSelect">
-      <option value="system">System</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
+      <option value="system">🖥️ System</option>
+      <option value="light">🌞 Light</option>
+      <option value="dark">🌙 Dark</option>
     </select>
   </nav>
   <main id="content">Select a page from the sidebar.</main>
@@ -110,7 +141,7 @@
         if (!res.ok) throw new Error("File not found");
         const text = await res.text();
         document.getElementById("content").innerHTML = marked.parse(text);
-        window.scrollTo(0, 0); // scroll to top after page change
+        window.scrollTo(0, 0);
       } catch (e) {
         document.getElementById("content").innerHTML = `<p style="color:red;">Error loading ${file}</p>`;
       }
@@ -124,7 +155,7 @@
     window.addEventListener("hashchange", handleHash);
     window.addEventListener("load", handleHash);
 
-    // Mobile toggle
+    // Mobile sidebar toggle
     const menuButton = document.getElementById("menuButton");
     const sidebar = document.getElementById("sidebar");
     menuButton.addEventListener("click", () => {
@@ -132,9 +163,7 @@
     });
 
     sidebar.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        sidebar.classList.remove("show");
-      });
+      link.addEventListener("click", () => sidebar.classList.remove("show"));
     });
 
     // THEME HANDLING
@@ -150,16 +179,12 @@
       localStorage.setItem("theme", theme);
     }
 
-    themeSelect.addEventListener("change", () => {
-      applyTheme(themeSelect.value);
-    });
+    themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
 
-    // Init theme
     const savedTheme = localStorage.getItem("theme") || "system";
     themeSelect.value = savedTheme;
     applyTheme(savedTheme);
 
-    // Watch for system changes
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
       if (themeSelect.value === "system") applyTheme("system");
     });
