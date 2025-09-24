@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <title>My Docs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- Fonts & Prism CSS -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-tomorrow.css" rel="stylesheet" />
-  
+
   <style>
     :root {
       --bg: #ffffff;
@@ -149,9 +149,7 @@
   <button id="menuButton">☰</button>
   <nav id="sidebar">
     <h2>My Docs</h2>
-    <a href="#intro.md">Introduction</a>
-    <a href="#guide.md">Guide</a>
-    <a href="#api.md">API Reference</a>
+    <div id="links"></div>
     <h3>Theme</h3>
     <select id="themeSelect">
       <option value="system">🖥️ System</option>
@@ -167,7 +165,26 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-javascript.min.js"></script>
 
   <script>
-    // Load Markdown and highlight code
+    const sidebar = document.getElementById("sidebar");
+    const linksDiv = document.getElementById("links");
+
+    // Load sidebar from JSON
+    async function loadSidebar() {
+      try {
+        const res = await fetch("sidebar.json");
+        const tabs = await res.json();
+        tabs.forEach(tab => {
+          const a = document.createElement("a");
+          a.href = "#" + tab.file;
+          a.innerText = tab.title;
+          a.addEventListener("click", () => sidebar.classList.remove("show")); // mobile close
+          linksDiv.appendChild(a);
+        });
+      } catch (e) {
+        console.error("Error loading sidebar JSON:", e);
+      }
+    }
+
     async function loadPage(file) {
       try {
         const res = await fetch(file);
@@ -176,7 +193,7 @@
         const html = marked.parse(text);
         document.getElementById("content").innerHTML = html;
 
-        // Highlight all code blocks
+        // Highlight code
         Prism.highlightAll();
 
         // Add copy buttons
@@ -207,13 +224,13 @@
     }
 
     window.addEventListener("hashchange", handleHash);
-    window.addEventListener("load", handleHash);
+    window.addEventListener("load", () => {
+      loadSidebar().then(handleHash);
+    });
 
-    // Mobile sidebar toggle
+    // Mobile toggle
     const menuButton = document.getElementById("menuButton");
-    const sidebar = document.getElementById("sidebar");
     menuButton.addEventListener("click", () => sidebar.classList.toggle("show"));
-    sidebar.querySelectorAll("a").forEach(link => link.addEventListener("click", () => sidebar.classList.remove("show")));
 
     // THEME HANDLING
     const themeSelect = document.getElementById("themeSelect");
@@ -226,6 +243,7 @@
       }
       localStorage.setItem("theme", theme);
     }
+
     themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
     const savedTheme = localStorage.getItem("theme") || "system";
     themeSelect.value = savedTheme;
